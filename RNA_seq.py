@@ -88,7 +88,7 @@ def main():
     #####fastqc#########
     folder_name = "FASTQC"
     os.makedirs(folder_name,exist_ok=True)
-    fastqc = "/data1/haol/wangyue/software/FastQC/fastqc"
+    fastqc = "/data1/kang/software/FastQC/fastqc"
     run_start = show_info("=======Filter step1:fastqc is start=======")
     cmd = "%s -f fastq -o FASTQC %s %s" % (fastqc, args.r1, args.r2)
     run_cmd(cmd)
@@ -98,14 +98,14 @@ def main():
     #####merge reports#########
     file_name = "FASTQC_Resport"
     os.makedirs(file_name,exist_ok=True)
-    multiqc = "/data1/haol/anaconda3/bin/multiqc"
+    multiqc = "/data1/kang/bin/multiqc"
     run_start = show_info("=======Filter step2:merge report is start=======")
     cmd = "%s %s -o FASTQC_Resport" % (multiqc, FASTQC) 
     run_cmd(cmd)
     run_time(run_start)
 
     #####delet adapter#########
-    Trimmomatic = "/data1/haol/wangyue/software/Trimmomatic-0.39/trimmomatic-0.39.jar"
+    Trimmomatic = "/data1/kang/software/Trimmomatic-0.39/trimmomatic-0.39.jar"
     name1 = os.path.basename(args.r1).split(".")[0]
     name2 = os.path.basename(args.r2).split(".")[0]
     run_start = show_info("=======Filter step3:delet adapter is start=======")
@@ -116,14 +116,15 @@ def main():
     run_time(run_start)
 
     #####mapping#########
-    hisat2 = "/data1/haol/wangyue/software/hisat2-2.2.1/hisat2"
+    hisat2 = "/data1/kang/software/hisat2-2.2.1/hisat2"
     basename = os.path.basename(args.r1).split("_")[0]
     run_start = show_info("=======Filter step4:mapping is start=======")
     cmd = "%s -t --dta -p %s -x %s -1 %s_clean_data.fastq.gz -2 %s__clean_data.fastq.gz -S %s.sam" % (hisat2, args.thread, args.ref, name1, name2, basename)
     run_cmd(cmd)
     run_time(run_start)
 
-    #####change for#########
+    #####change for########
+
     run_start = show_info("=======Filter step5:change for is start=======")
     cmd = "samtools view -bS %s.sam > %s.bam" % (basename, basename)
     run_cmd(cmd)
@@ -142,14 +143,14 @@ def main():
     run_time(run_start)
 
     #####transcriptome assembly#######
-    stringtie = "/data1/haol/wangyue/software/stringtie-2.2.3.Linux_x86_64/stringtie"
+    stringtie = "/data1/kang/stringtie-2.2.3.Linux_x86_64/stringtie"
     run_start = show_info("=======Filter step7:transcriptome asseembly is start=======")
     cmd = "%s -p %s -G %s -o %s.gtf %s.sort.bam" % (stringtie, args.thread, args.anno, basename, basename)
     run_cmd(cmd)
     run_time(run_start)
 
     #####HTseq counting#######
-    htseq = "/data1/haol/anaconda3/bin/htseq-count"
+    htseq = "/data1/kang/anaconda3/bin/htseq-count"
     run_start = show_info("=======Filter step8:HTseq counting is start=======")
     cmd = "%s -f bam %s.sort.bam %s > %s_count.txt" % (htseq, basename, args.anno, basename)
     run_cmd(cmd)
